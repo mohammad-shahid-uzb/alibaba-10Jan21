@@ -1,0 +1,18 @@
+export default {
+  primary: "#fc5c65",
+  secondary: "#4ecdc4",
+  black: "#000",
+  white: "#fff",
+  medium: "#6e6969",
+  light: "#f8f4f4",
+  dark: "#0c0c0c",
+  danger: "#ff5252",
+  baseColor1: "#E8F2FF",
+  bgColor1: "#F5F5F3",
+  bgWhite: "#FFFFFF",
+  bgTopWhite: "#EFF7FC",
+  bgButton: "#F4F5F6",
+  tomato: "#ff8254",
+  yellow: "#FECB2E",
+  red: "#FC3D39",
+};

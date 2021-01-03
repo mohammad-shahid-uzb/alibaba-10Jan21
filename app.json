@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "alibabaStore",
+    "slug": "alibabaStore",
+    "platforms": ["ios", "android", "web"],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./app/assets/icon.png",
+    "splash": {
+      "image": "./app/assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#6975ec"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to upload products images for public display.",
+        "NSPhotoLibraryUsageDescription": "This app uses the photo library to upload products images for public display.",
+        "NSPhotoLibraryAddUsageDescription": "This app uses the photo library to upload products images for public display.",
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ]
+      },
+      "supportsTablet": true,
+      "buildNumber": "1.0.0",
+      "bundleIdentifier": "com.akros.alibabastore"
+    },
+    "android": {
+      "package": "com.akros.alibabastore",
+      "versionCode": 1,
+      "useNextNotificationsApi": true
+    },
+    "description": "Торговая площадка для рекламы товаров.",
+    "notification": {
+      "iosDisplayInForeground": true
+    }
+  }
+}
