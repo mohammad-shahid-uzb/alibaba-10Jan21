@@ -27,5 +27,4 @@ function CategoryScreen({ navigation }) {
   );
 }
 
-
 export default CategoryScreen;

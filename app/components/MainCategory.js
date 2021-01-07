@@ -1,9 +1,10 @@
 import React, { useContext } from "react";
-import { StyleSheet, ScrollView, View, Text } from "react-native";
 import Screen from "./Screen";
 import { ListItem } from "react-native-elements";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LocaleContext } from "../locales/index.js";
+import { ListItemSeparator } from "../components/lists";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { StyleSheet, ScrollView, View, Text } from "react-native";
 
 export default function MainCategory({
   size = 40,
@@ -147,18 +148,21 @@ export default function MainCategory({
       </View>
       <ScrollView>
         {items.map((item, i) => (
-          <ListItem key={i} onPress={() => onPress(item)}>
-            <ListItem.Content style={styles.item}>
-              <MaterialCommunityIcons
-                name={item.icon}
-                color={iconColor}
-                size={size * 0.7}
-              />
-              <ListItem.Title style={styles.title} numberOfLines={2}>
-                {item.label}
-              </ListItem.Title>
-            </ListItem.Content>
-          </ListItem>
+          <>
+            <ListItem key={i} onPress={() => onPress(item)}>
+              <ListItem.Content style={styles.item}>
+                <MaterialCommunityIcons
+                  name={item.icon}
+                  color={iconColor}
+                  size={size * 0.7}
+                />
+                <ListItem.Title style={styles.title} numberOfLines={2}>
+                  {item.label}
+                </ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+            <ListItemSeparator />
+          </>
         ))}
       </ScrollView>
     </Screen>

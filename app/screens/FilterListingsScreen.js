@@ -73,8 +73,6 @@ function FilterListingsScreen({ navigation, route }) {
 
 const styles = StyleSheet.create({
   screen: {
-    padding: 10,
-    marginTop: 10,
     backgroundColor: colors.light,
   },
   text: {

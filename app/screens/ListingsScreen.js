@@ -7,6 +7,7 @@ import {
   StatusBar,
   Platform,
   Text,
+  TouchableOpacity,
 } from "react-native";
 import CardCat from "../components/Cardcate";
 import useApi from "../hooks/useApi";
@@ -24,7 +25,6 @@ import Cart from "../components/Cart";
 import { LocaleContext } from "../locales/index.js";
 import { CartContext } from "../utility/cartContext";
 import ActivityIndicator from "../components/ActivityIndicator";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 function ListingsScreen({ navigation, value = 1 }) {
   const getcategoriesApi = useApi(categoriesApi.getCategories);
@@ -61,7 +61,7 @@ function ListingsScreen({ navigation, value = 1 }) {
   }
   const groupedCategory = groupBy(searchedDataSource, "categoryName");
   const categoryItem1 = {
-    _id: "5f82e140754d1800176f0052",
+    _id: "5ff2c12dd13ce52abaa315a1",
     label: "First cat",
   };
   const categoryItem2 = {
@@ -122,7 +122,7 @@ function ListingsScreen({ navigation, value = 1 }) {
           )}
           <View style={styles.TopSpace}>
             <FlatList
-              data={Object.keys(groupedCategory)}
+              data={Object.keys(groupedCategory).slice(2, 4)}
               initialNumToRender={10}
               windowSize={5}
               maxToRenderPerBatch={5}

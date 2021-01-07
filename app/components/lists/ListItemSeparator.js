@@ -3,14 +3,14 @@ import { StyleSheet, View } from "react-native";
 
 import colors from "../../config/colors";
 
-function ListItemSeparator() {
-  return <View style={styles.separator} />;
+function ListItemSeparator(index) {
+  return <View key={index} style={styles.separator} />;
 }
 
 const styles = StyleSheet.create({
   separator: {
     width: "100%",
-    height: 1,
+    height: 2,
     backgroundColor: colors.light,
   },
 });

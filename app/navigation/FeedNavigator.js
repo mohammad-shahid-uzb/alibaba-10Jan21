@@ -78,7 +78,7 @@ function FeedNavigator({ navigation }) {
       <Stack.Screen name="Order Confirmation" component={OrderConfirmation} />
       <Stack.Screen
         name="Order Accepted"
-        options={{ headerShown: false }}
+        // options={{ headerShown: false }}
         component={OrderAccepted}
       />
       <Stack.Screen name="Address Form" component={AddressEditScreen} />

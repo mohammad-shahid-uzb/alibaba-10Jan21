@@ -30,9 +30,14 @@ import useApi from "../hooks/useApi";
 const OrderConfirmation = ({ navigation, route }) => {
   const [uploadVisible, setUploadVisible] = useState(false);
   const [progress, setProgress] = useState(0);
-  const { cart, increment, decrement, total, payment } = useContext(
-    CartContext
-  );
+  const {
+    cart,
+    increment,
+    decrement,
+    total,
+    payment,
+    clearStorage,
+  } = useContext(CartContext);
   const { user } = useAuth();
 
   function groupBy(objectArray, property) {
@@ -103,6 +108,7 @@ const OrderConfirmation = ({ navigation, route }) => {
         "Не удалось сохранить объявление. Пожалуйста, попробуйте еще раз."
       );
     } else {
+      clearStorage();
       navigation.navigate(routes.ORDERACCEPTED, { data, shops });
       return alert("Заказ успешно создан");
     }

@@ -38,6 +38,9 @@ const CardListScreen = ({ navigation, route }) => {
   const getCards = async (userId) => {
     const result = await getcardsApi.request({ userId });
     setCardData(result.data);
+    return () => {
+      result.remove();
+    };
   };
 
   useEffect(() => {

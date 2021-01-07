@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, View, ScrollView, FlatList } from "react-native";
 import { EvilIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -7,10 +7,13 @@ import colors from "../config/colors";
 import Text from "../components/Text";
 import { LocaleContext } from "../locales/index";
 import { ListItemSeparator } from "../components/lists";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import ShopCard from "../components/ShopCard";
 import useAuth from "../auth/useAuth";
 import moment from "moment";
+import { YellowBox } from "react-native";
+
+YellowBox.ignoreWarnings([
+  "Non-serializable values were found in the navigation state",
+]);
 
 const OrderAccepted = ({ route }) => {
   const { user } = useAuth();
@@ -19,35 +22,46 @@ const OrderAccepted = ({ route }) => {
   Object.keys(ob).forEach((key) => {
     shopOrder.push(ob[key]);
   });
-  const str = JSON.stringify(route.name);
-  let date = shopOrder.map((i) => i.result.order.createdAt);
-  const [First] = date;
-  let acceptedTime = moment(First, "YYYY-MM-DDTHH: mm: ss").format("LT");
-  const accepted = str.substr(7, 11);
-  const packing = "false";
-  const indelivery = "false";
-  const delivered = "false";
 
-  const addressBackEnd = shopOrder.map((i) => i.result.order.deliveryAddress);
-  const [Address] = addressBackEnd;
+  const shopStatus = shopOrder.map((item) => item.result.order.status);
+
+  const deliveryAddress = shopOrder.map(
+    (item) => item.result.order.deliveryAddress
+  );
+
+  const [Address] = deliveryAddress;
   const FirstAddress = JSON.parse(Address);
 
-  const shopId = shopOrder.map((i) => i.result.order.shopId);
-  const OrderArr = shopOrder.map((i) => i.result.order);
-  const shops = route.params.shops;
-  let filtered = shops.filter((shop) => shopId.includes(shop.userId));
+  const orderAmount =
+    shopOrder
+      .map((item) => item.result.order.amount)
+      .reduce((a, b) => a + b, 0) / 100;
 
-  const shopList = [];
-  filtered.forEach((shop) => {
-    shop.status = "true";
-    shopList.push({ shop });
-  });
   const delivery = 150;
   const shopNumber = shopOrder.length;
   const shippingCharges = delivery * shopNumber;
-  const FinalAmount =
-    shopOrder.map((i) => i.result.order.amount).reduce((a, b) => a + b, 0) /
-    100;
+
+  const orderNumber = shopOrder.map((item) => item.result.order.orderNumber);
+
+  const paymentDetails = shopOrder.map(
+    (item) => item.result.order.paymentDetails.method
+  );
+  const [Method] = paymentDetails;
+  const [STATUS] = shopStatus;
+
+  const accepted = STATUS.accepted;
+  const timeAccepted = moment(accepted).format("DD MMM hh:mm a");
+  const packing = STATUS.packaged;
+  const timePacking = moment(packing).format("DD MMM YY hh:mm a");
+
+  const indelivery = STATUS.indelivery;
+  const timeIndelivery = moment(indelivery).format("DD MMM YY hh:mm a");
+
+  const delivered = STATUS.delivered;
+  const timeDelivered = moment(delivered).format("DD MMM YY hh:mm a");
+
+  const OrderArr = shopOrder.map((item) => item.result.order);
+  const shops = route.params.shops;
 
   function mergeShopProfileWithOrder(OrderArr, shops) {
     const shopProfilesById = shops.reduce((a, b) => {
@@ -62,8 +76,13 @@ const OrderAccepted = ({ route }) => {
   }
   const OrderWithShop = mergeShopProfileWithOrder(OrderArr, shops);
 
+  const shopCard = OrderWithShop.map((item) => ({
+    shop: item.shopProfile,
+    status: item.status,
+    number: item.orderNumber,
+  }));
+
   const { strings } = useContext(LocaleContext);
-  console.log("strings ", strings.acceptedTitle);
 
   return (
     <Screen style={{ backgroundColor: colors.bgWhite, padding: 5 }}>
@@ -77,101 +96,108 @@ const OrderAccepted = ({ route }) => {
         <View style={styles.cardTop}>
           <View style={styles.cardStatus}>
             <View style={{ flexDirection: "row" }}>
-              <View style={styles.containerTopAccept}>
-                <Text style={{ fontSize: 10 }}>{strings.accepted}</Text>
+              <View style={styles.containerTopUpAccept}>
+                <Text style={{ fontSize: 10 }}>Accepted</Text>
               </View>
               <View style={styles.containerTopLine} />
-              <View style={styles.containerTopAccept}>
-                <Text style={{ fontSize: 10 }}>{strings.packing}</Text>
+              <View style={styles.containerTopUpAccept}>
+                <Text style={{ fontSize: 10 }}>Packaging</Text>
               </View>
               <View style={styles.containerTopLine} />
-              <View style={styles.containerTopAccept}>
-                <Text style={{ fontSize: 10 }}>{strings.indelivery}</Text>
+              <View style={styles.containerTopUpAccept}>
+                <Text style={{ fontSize: 10 }}>In Transit</Text>
               </View>
 
               <View style={styles.containerTopLine} />
-              <View style={styles.containerTopAccept}>
-                <Text style={{ fontSize: 10 }}>{strings.delivered}</Text>
+              <View style={styles.containerTopUpAccept}>
+                <Text style={{ fontSize: 10 }}>Delivered</Text>
               </View>
             </View>
           </View>
           <View style={{ flexDirection: "row" }}>
             <View style={styles.containerAccept}>
-              {accepted === "false" ? (
-                <EvilIcons name="minus" size={34} color={colors.primary} />
-              ) : (
+              {accepted !== null ? (
                 <EvilIcons name="check" size={34} color={colors.secondary} />
+              ) : (
+                <EvilIcons name="minus" size={34} color={colors.primary} />
               )}
             </View>
-            {packing === "false" ? (
-              <View style={styles.containerLine} />
-            ) : (
+            {packing !== null ? (
               <View style={styles.containerGreenLine} />
+            ) : (
+              <View style={styles.containerLine} />
             )}
             <View style={styles.containerAccept}>
-              {packing === "false" ? (
-                <EvilIcons name="minus" size={34} color={colors.primary} />
-              ) : (
+              {packing !== null ? (
                 <EvilIcons name="check" size={34} color={colors.secondary} />
+              ) : (
+                <EvilIcons name="minus" size={34} color={colors.primary} />
               )}
             </View>
-            {indelivery === "false" ? (
-              <View style={styles.containerLine} />
-            ) : (
+            {indelivery !== null ? (
               <View style={styles.containerGreenLine} />
+            ) : (
+              <View style={styles.containerLine} />
             )}
             <View style={styles.containerAccept}>
-              {indelivery === "false" ? (
-                <EvilIcons name="minus" size={34} color={colors.primary} />
-              ) : (
+              {indelivery !== null ? (
                 <EvilIcons name="check" size={34} color={colors.secondary} />
+              ) : (
+                <EvilIcons name="minus" size={34} color={colors.primary} />
               )}
             </View>
-            {delivered === "false" ? (
-              <View style={styles.containerLine} />
-            ) : (
+            {delivered !== null ? (
               <View style={styles.containerGreenLine} />
+            ) : (
+              <View style={styles.containerLine} />
             )}
             <View style={styles.containerAccept}>
-              {delivered === "false" ? (
-                <EvilIcons name="minus" size={34} color={colors.primary} />
-              ) : (
+              {delivered !== null ? (
                 <EvilIcons name="check" size={34} color={colors.secondary} />
+              ) : (
+                <EvilIcons name="minus" size={34} color={colors.primary} />
               )}
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginLeft: 15,
-              }}
-            >
-              <MaterialCommunityIcons
-                color={colors.medium}
-                name="chevron-right"
-                size={25}
-              />
             </View>
           </View>
-          <View style={styles.cardStatus}>
-            <View style={{ flexDirection: "row" }}>
-              <View style={styles.containerTopAccept}>
-                <Text style={{ fontSize: 10, paddingLeft: 2 }}>
-                  {acceptedTime}
+          <View style={{ flexDirection: "row" }}>
+            <View style={styles.containerTopAccept}>
+              {accepted !== null ? (
+                <Text style={{ fontSize: 9 }} numberOfLines={2}>
+                  {timeAccepted}
                 </Text>
-              </View>
-              <View style={styles.containerTopLine} />
-              <View style={styles.containerTopAccept}>
-                <Text style={{ fontSize: 10, paddingLeft: 8 }}>Times</Text>
-              </View>
-              <View style={styles.containerTopLine} />
-              <View style={styles.containerTopAccept}>
-                <Text style={{ fontSize: 10, paddingLeft: 8 }}>Times</Text>
-              </View>
-              <View style={styles.containerTopLine} />
-              <View style={styles.containerTopAccept}>
-                <Text style={{ fontSize: 10, paddingLeft: 11 }}>Times</Text>
-              </View>
+              ) : (
+                <Text style={{ fontSize: 9 }}></Text>
+              )}
+            </View>
+            <View style={styles.containerTopLine} />
+            <View style={styles.containerTopAccept}>
+              {packing !== null ? (
+                <Text style={{ fontSize: 9 }} numberOfLines={2}>
+                  {timePacking}
+                </Text>
+              ) : (
+                <Text style={{ fontSize: 9 }}></Text>
+              )}
+            </View>
+            <View style={styles.containerTopLine} />
+            <View style={styles.containerTopAccept}>
+              {indelivery !== null ? (
+                <Text style={{ fontSize: 9 }} numberOfLines={2}>
+                  {timeIndelivery}
+                </Text>
+              ) : (
+                <Text style={{ fontSize: 9 }}></Text>
+              )}
+            </View>
+            <View style={styles.containerTopLine} />
+            <View style={styles.containerTopAccept}>
+              {delivered !== null ? (
+                <Text style={{ fontSize: 9 }} numberOfLines={2}>
+                  {timeDelivered}
+                </Text>
+              ) : (
+                <Text style={{ fontSize: 9 }}></Text>
+              )}
             </View>
           </View>
         </View>
@@ -236,7 +262,7 @@ const OrderAccepted = ({ route }) => {
                     <Text style={styles.invoicetitle}>Card Type</Text>
                   </View>
                   <Text style={styles.invoiceText}>
-                    {route.params.cardType}
+                    {/* {route.params.cardType} */}Uz Card
                   </Text>
                 </View>
               )}
@@ -255,7 +281,7 @@ const OrderAccepted = ({ route }) => {
                   <Text style={styles.invoicetitle}>Product cost</Text>
                 </View>
                 <Text style={styles.invoiceText}>
-                  {FinalAmount - shippingCharges} UZS
+                  {orderAmount - shippingCharges} UZS
                 </Text>
               </View>
               <ListItemSeparator />
@@ -276,7 +302,7 @@ const OrderAccepted = ({ route }) => {
                   <Text style={{ fontWeight: "bold" }}>Final Payment</Text>
                 </View>
                 <Text style={{ fontWeight: "bold", paddingTop: 5 }}>
-                  {FinalAmount} UZS
+                  {orderAmount} UZS
                 </Text>
               </View>
               <ListItemSeparator />
@@ -292,11 +318,41 @@ const OrderAccepted = ({ route }) => {
               <View style={{ marginBottom: 5 }}>
                 <FlatList
                   horizontal
-                  data={OrderWithShop}
+                  data={shopCard}
                   keyExtractor={(listing, index) => index.toString()}
                   renderItem={({ item }) => (
                     <View style={{ margin: 2 }}>
-                      <ShopCard item={item} />
+                      <View style={styles.shopcard}>
+                        <View style={styles.shopdetailsContainer}>
+                          <Text style={styles.shoptitle} numberOfLines={1}>
+                            ShopName: {item.shop.name}
+                          </Text>
+                          <Text style={styles.shopsubTitle} numberOfLines={3}>
+                            Address: {item.shop.officeAddress}
+                          </Text>
+                          <Text style={styles.shopsubTitle} numberOfLines={2}>
+                            Contact Name: {item.shop.directorName}
+                          </Text>
+                          <Text style={styles.shopsubTitle} numberOfLines={2}>
+                            Phone: {item.shop.contactNumber} / {item.shop.phone}
+                          </Text>
+                          <Text style={styles.shopsubTitle} numberOfLines={2}>
+                            Status:
+                            {item.status.delivered
+                              ? "Delivered"
+                              : item.status.indelivery
+                              ? "In Transit"
+                              : item.status.packaged
+                              ? "Packaged"
+                              : item.status.accepted
+                              ? "Accepted"
+                              : "None"}
+                          </Text>
+                          <Text style={styles.shopsubTitle} numberOfLines={2}>
+                            Invoice No: {item.number}
+                          </Text>
+                        </View>
+                      </View>
                     </View>
                   )}
                 />
@@ -370,7 +426,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cardStatus: {
-    height: 15,
+    width: "160%",
   },
   cardItems: {
     borderRadius: 8,
@@ -399,19 +455,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   containerAccept: {
-    alignItems: "center",
     flexDirection: "row",
     width: "10%",
   },
-  containerTopAccept: {
-    alignItems: "center",
+  containerTopUpAccept: {
     flexDirection: "row",
-    width: "15%",
-    paddingLeft: 5,
+  },
+  containerTopAccept: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    marginRight: -9,
   },
   containerLine: {
     alignItems: "center",
-    width: "20%",
+    width: "22%",
     borderBottomColor: "red",
     borderBottomWidth: 1,
     height: "50%",
@@ -420,7 +477,7 @@ const styles = StyleSheet.create({
   },
   containerGreenLine: {
     alignItems: "center",
-    width: "20%",
+    width: "22%",
     borderBottomColor: "green",
     borderBottomWidth: 1,
     height: "50%",
@@ -576,6 +633,66 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
     fontSize: 16,
   },
+  shopcard: {
+    borderRadius: 15,
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: "#8FD9FA",
+    width: 300,
+  },
+  shopdetailsContainer: {
+    padding: 10,
+  },
+  shopsubTitle: {
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  shoptitle: {
+    marginBottom: 7,
+  },
 });
 
 export default OrderAccepted;
+
+// const str = JSON.stringify(route.name);
+// let date = shopOrder.map((i) => i.result.order.createdAt);
+// const [First] = date;
+// let acceptedTime = moment(First, "YYYY-MM-DDTHH: mm: ss").format("LT");
+// const accepted = str.substr(7, 11);
+// const packing = "false";
+// const indelivery = "false";
+// const delivered = "false";
+
+// const addressBackEnd = shopOrder.map((i) => i.result.order.deliveryAddress);
+// const [Address] = addressBackEnd;
+// const FirstAddress = JSON.parse(Address);
+
+// const shopId = shopOrder.map((i) => i.result.order.shopId);
+// const OrderArr = shopOrder.map((i) => i.result.order);
+// const shops = route.params.shops;
+// let filtered = shops.filter((shop) => shopId.includes(shop.userId));
+
+// const shopList = [];
+// filtered.forEach((shop) => {
+//   shop.status = "true";
+//   shopList.push({ shop });
+// });
+// const delivery = 150;
+// const shopNumber = shopOrder.length;
+// const shippingCharges = delivery * shopNumber;
+// const FinalAmount =
+//   shopOrder.map((i) => i.result.order.amount).reduce((a, b) => a + b, 0) /
+//   100;
+
+// function mergeShopProfileWithOrder(OrderArr, shops) {
+//   const shopProfilesById = shops.reduce((a, b) => {
+//     a[b.userId] = b;
+//     return a;
+//   }, {});
+
+//   return OrderArr.map((order) => {
+//     order["shopProfile"] = shopProfilesById[order.shopId];
+//     return order;
+//   });
+// }
+// const OrderWithShop = mergeShopProfileWithOrder(OrderArr, shops);

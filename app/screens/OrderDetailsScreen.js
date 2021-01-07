@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import moment from "moment";
 import colors from "../config/colors";
 import Text from "../components/Text";
@@ -42,6 +48,8 @@ const OrderDetailsScreen = ({ navigation, route }) => {
     Order: route.params.item.orderNumber,
     orderId: route.params.item._id,
   };
+  const [item] = ShopDetails.shopProfile;
+  console.log("shopOne ", item);
   return (
     <Screen style={{ backgroundColor: colors.bgWhite, padding: 5 }}>
       <View style={styles.cardUpperTop}>
@@ -293,7 +301,39 @@ const OrderDetailsScreen = ({ navigation, route }) => {
               </View>
               <ListItemSeparator />
               <View style={{ marginBottom: 5 }}>
-                <ShopCard item={ShopDetails} />
+                <View style={{ margin: 2 }}>
+                  <View style={styles.shopcard}>
+                    <View style={styles.shopdetailsContainer}>
+                      <Text style={styles.shoptitle} numberOfLines={1}>
+                        ShopName: {item.name}
+                      </Text>
+                      <Text style={styles.shopsubTitle} numberOfLines={3}>
+                        Address: {item.officeAddress}
+                      </Text>
+                      <Text style={styles.shopsubTitle} numberOfLines={2}>
+                        Contact Name: {item.directorName}
+                      </Text>
+                      <Text style={styles.shopsubTitle} numberOfLines={2}>
+                        Phone: {item.contactNumber} / {item.phone}
+                      </Text>
+                      <Text style={styles.shopsubTitle} numberOfLines={2}>
+                        Status:
+                        {ShopDetails.status.delivered
+                          ? "Delivered"
+                          : ShopDetails.status.indelivery
+                          ? "In Transit"
+                          : ShopDetails.status.packaged
+                          ? "Packaged"
+                          : ShopDetails.status.accepted
+                          ? "Accepted"
+                          : "None"}
+                      </Text>
+                      <Text style={styles.shopsubTitle} numberOfLines={2}>
+                        Invoice No: {ShopDetails.Order}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
               </View>
             </View>
           </View>
@@ -572,6 +612,23 @@ const styles = StyleSheet.create({
   invoicetitle: {
     paddingLeft: 4,
     fontSize: 16,
+  },
+  shopcard: {
+    borderRadius: 15,
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: "#8FD9FA",
+    width: 300,
+  },
+  shopdetailsContainer: {
+    padding: 10,
+  },
+  shopsubTitle: {
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  shoptitle: {
+    marginBottom: 7,
   },
 });
 

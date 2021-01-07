@@ -27,9 +27,7 @@ function CardFilter({
           uri={imageUrl}
         />
         <View style={styles.detailsContainer}>
-          <Text style={styles.title} numberOfLines={1}>
-            {title}
-          </Text>
+          <Text style={styles.title}>{title}</Text>
           <Text style={styles.subTitle} numberOfLines={2}>
             {subTitle}
           </Text>
@@ -46,10 +44,11 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 10,
     backgroundColor: colors.white,
-    marginRight: 15,
+    marginTop: 5,
+    marginBottom: 5,
     overflow: "hidden",
     height: 240,
-    width: 400,
+    width: "100%",
   },
   detailsContainer: {
     position: "absolute",
@@ -61,12 +60,25 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   subTitle: {
-    color: colors.danger,
-    fontWeight: "bold",
+    color: colors.dark,
   },
   title: {
-    color: colors.tomato,
+    color: "green",
     marginBottom: 7,
+    fontWeight: "bold",
+    top: -100,
+    left: 0,
+    backgroundColor: "#D60E64",
+    fontSize: 15,
+    color: "#fff",
+  },
+  discountText: {
+    position: "absolute",
+    top: -100,
+    left: 320,
+    backgroundColor: "#D60E64",
+    fontSize: 15,
+    color: "#fff",
   },
 });
 
